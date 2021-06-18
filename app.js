@@ -67,58 +67,68 @@ const galleryItems = [
 const ulItem = document.querySelector('.gallery');
 const lightbox = document.querySelector('.lightbox');
 const imgModal = document.querySelector('.lightbox__image');
+const divClose = document.querySelector('.lightbox__overlay');
 
 ulItem.addEventListener('click', openModal);
 lightbox.addEventListener('click', closeModal);
+divClose.addEventListener('click', closeModal);
+document.addEventListener('keydown', closeModal);
 
-function createGallery(array) {
-  array.forEach(elem => {
-    
-    const liElem = document.createElement('li');
-    liElem.classList.add('gallery__item');
+const addGallery = galleryItems.reduce(
+  (acc, elem) =>
+    acc +
+    `
+    <li class="gallery__item">
+  <a
+    class="gallery__link"
+    href='${elem.original}'
+  >
+    <img
+      class="gallery__image"
+      src='${elem.preview}'
+      data-source='${elem.original}'
+      alt='${elem.description}'
+    />
+  </a>
+</li>`,
+  ''
+);
 
-    const linkElem = document.createElement('a');
-    linkElem.setAttribute('href', elem.original);
-    linkElem.classList.add('gallery__link');
-
-    const imgElem = document.createElement('img');
-    imgElem.setAttribute('src', elem.preview);
-    imgElem.setAttribute('alt', elem.description);
-    imgElem.setAttribute('data-source', elem.original);
-    imgElem.classList.add('gallery__image');
-
-    addedElem(ulItem, liElem);
-    addedElem(liElem, linkElem);
-    addedElem(linkElem, imgElem);
-  });
-}
+ulItem.innerHTML = addGallery;
 
 function openModal(event) {
   event.preventDefault();
   const targetBlock = event.target;
- 
-  if (targetBlock) {
-    lightbox.classList.add('is-open');
-    console.log(targetBlock.parentNode.getAttribute('href'));
-    imgModal.setAttribute('src', targetBlock.parentNode.getAttribute('href'));
-    imgModal.setAttribute('alt', targetBlock.getAttribute('alt'));
-  }
+
+  lightbox.classList.add('is-open');
+  imgModal.setAttribute('src', targetBlock.dataset.source);
+  imgModal.setAttribute('alt', targetBlock.getAttribute('alt'));
 }
 
-function closeModal(event) { 
-  const parent = event.currentTarget;
+function closeModal(event) {
   const targetBlock = event.target;
- 
-  if (targetBlock.tagName === 'BUTTON') {
+
+  if (
+    targetBlock.tagName === 'BUTTON' ||
+    event.code === 'Escape' ||
+    targetBlock.tagName === 'DIV'
+  ) {
     lightbox.classList.remove('is-open');
     imgModal.removeAttribute('src');
     imgModal.removeAttribute('alt');
   }
 
-  console.log(parent);
-  console.log(targetBlock.tagName);
+  if (event.code === 'ArrowRight') {
+    const findElem = galleryItems.findIndex(
+      elem => elem.original === imgModal.getAttribute('src')
+    );
+    imgModal.setAttribute('src', galleryItems[findElem + 1].original);
+  }
+
+  if (event.code === 'ArrowLeft') {
+    const findElem = galleryItems.findIndex(
+      elem => elem.original === imgModal.getAttribute('src')
+    );
+    imgModal.setAttribute('src', galleryItems[findElem - 1].original);
+  }
 }
-
-const addedElem = (firstElem, secondElem) => firstElem.append(secondElem);
-
-createGallery(galleryItems);
