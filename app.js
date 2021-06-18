@@ -74,6 +74,11 @@ lightbox.addEventListener('click', closeModal);
 divClose.addEventListener('click', closeModal);
 document.addEventListener('keydown', closeModal);
 
+const removeAtr = atr => imgModal.removeAttribute(atr);
+const setAtr = (atr, value) => {
+  imgModal.setAttribute(atr, value);
+};
+
 const addGallery = galleryItems.reduce(
   (acc, elem) =>
     acc +
@@ -101,8 +106,8 @@ function openModal(event) {
   const targetBlock = event.target;
 
   lightbox.classList.add('is-open');
-  imgModal.setAttribute('src', targetBlock.dataset.source);
-  imgModal.setAttribute('alt', targetBlock.getAttribute('alt'));
+  setAtr('src', targetBlock.dataset.source);
+  setAtr('alt', targetBlock.getAttribute('alt'));
 }
 
 function closeModal(event) {
@@ -114,8 +119,8 @@ function closeModal(event) {
     targetBlock.tagName === 'DIV'
   ) {
     lightbox.classList.remove('is-open');
-    imgModal.removeAttribute('src');
-    imgModal.removeAttribute('alt');
+    removeAtr('src');
+    removeAtr('alt');
   }
 
   if (event.code === 'ArrowRight') {
